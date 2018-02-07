@@ -7,7 +7,8 @@ function maketype(name,
                   jumps,
                   jumps_expr,
                   p_matrix,
-                  syms;
+                  syms,
+                  test;
                   params = Symbol[],
                   pfuncs=Vector{Expr}(0),
                   symjac=Matrix{SymEngine.Basic}(0,0),
@@ -25,6 +26,7 @@ function maketype(name,
         syms::Vector{Symbol}
         params::Vector{Symbol}
         symjac::Matrix{SymEngine.Basic}
+        test
     end)
     # Make the default constructor
     constructorex = :($(name)(;
@@ -38,6 +40,7 @@ function maketype(name,
                   $(Expr(:kw,:f_symfuncs,f_symfuncs)),
                   $(Expr(:kw,:syms,syms)),
                   $(Expr(:kw,:params,params)),
+                  $(Expr(:kw,:test,test)),
                   $(Expr(:kw,:symjac,symjac))) =
                   $(name)(
                       f,
@@ -51,6 +54,7 @@ function maketype(name,
                       syms,
                       params,
                       symjac,
+                      test,
                       )) |> esc
 
                       #f_funcs,symfuncs,pfuncs,syms,symjac) |> esc

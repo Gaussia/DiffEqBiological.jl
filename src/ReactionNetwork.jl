@@ -57,8 +57,9 @@ function coordinate(name, ex::Expr, p)
 
     # Build the type
     exprs = Vector{Expr}(0)
+    test = Expr(:quote, f.args[2])
 
-    typeex,constructorex = maketype(name, f, f_expr, f_symfuncs, g, g_expr, jumps, jumps_expr, p_matrix, syms; params=params, symjac=symjac)
+    typeex,constructorex = maketype(name, f, f_expr, f_symfuncs, g, g_expr, jumps, jumps_expr, p_matrix, syms, test; params=params, symjac=symjac)
     push!(exprs,typeex)
     push!(exprs,constructorex)
 
