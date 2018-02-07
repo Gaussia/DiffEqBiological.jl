@@ -1,11 +1,12 @@
 function maketype(name,
                   f,
-                  f_funcs,
+                  f_expr,
                   f_symfuncs,
                   g,
-                  g_funcs,
+                  g_expr,
                   jumps,
-                  jumps_expr,
+                  jump_rate_expr,
+                  jump_affect_expr,
                   p_matrix,
                   syms,
                   test;
@@ -16,12 +17,13 @@ function maketype(name,
 
     typeex = :(mutable struct $name <: AbstractReaction
         f::Function
-        f_funcs::Vector{Expr}
+        f_expr::Vector{Expr}
         f_symfuncs::Matrix{SymEngine.Basic}
         g::Function
-        g_funcs::Expr
+        g_expr::Vector{Expr}
         jumps::Tuple{ConstantRateJump,Vararg{ConstantRateJump}}
-        jumps_expr::Expr
+        jump_rate_expr::Tuple{Any,Vararg{Any}}
+        jump_affect_expr::Tuple{Vector{Expr},Vararg{Vector{Expr}}}
         p_matrix::Array{Float64,2}
         syms::Vector{Symbol}
         params::Vector{Symbol}
@@ -31,11 +33,12 @@ function maketype(name,
     # Make the default constructor
     constructorex = :($(name)(;
                   $(Expr(:kw,:f,f)),
-                  $(Expr(:kw,:f_funcs,f_funcs)),
+                  $(Expr(:kw,:f_expr,f_expr)),
                   $(Expr(:kw,:g,g)),
-                  $(Expr(:kw,:g_funcs,g_funcs)),
+                  $(Expr(:kw,:g_expr,g_expr)),
                   $(Expr(:kw,:jumps,jumps)),
-                  $(Expr(:kw,:jumps_expr,jumps_expr)),
+                  $(Expr(:kw,:jump_rate_expr,jump_affect_expr)),
+                  $(Expr(:kw,:jump_affect_expr,jump_affect_expr)),
                   $(Expr(:kw,:p_matrix,p_matrix)),
                   $(Expr(:kw,:f_symfuncs,f_symfuncs)),
                   $(Expr(:kw,:syms,syms)),
@@ -44,12 +47,13 @@ function maketype(name,
                   $(Expr(:kw,:symjac,symjac))) =
                   $(name)(
                       f,
-                      f_funcs,
+                      f_expr,
                       f_symfuncs,
                       g,
-                      g_funcs,
+                      g_expr,
                       jumps,
-                      jumps_expr,
+                      jump_affect_expr,
+                      jump_affect_expr,
                       p_matrix,
                       syms,
                       params,
