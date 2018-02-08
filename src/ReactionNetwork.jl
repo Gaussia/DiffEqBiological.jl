@@ -54,13 +54,32 @@ function coordinate(name, ex::Expr, p)
     exprs = Vector{Expr}(0)
     test = Expr(:quote, f.args[2])
 
-    typeex,constructorex = maketype(name, f, f_expr, f_symfuncs, g, g_expr, jumps, jumps_expr, p_matrix, syms, test; params=params, symjac=symjac)
+    ## only get the right-hand-side of the equations.
+    f_funcs = [element.args[2] for element in f_expr]
+    g_funcs = [element.args[2] for element in g_expr]
+
+    typeex,constructorex = maketype(name, f, f_funcs, f_symfuncs, g, g_funcs, jumps, Meta.quot(jump_rate_expr), Meta.quot(jump_affect_expr), p_matrix, syms, test; params=params, symjac=symjac)
     push!(exprs,typeex)
     push!(exprs,constructorex)
 
     # export type constructor
     def_const_ex = :(($name)()) |> esc
     push!(exprs,def_const_ex)
+
+
+
+    #### ParameterizedFunctions
+
+    opts = Dict{Symbol,Bool}(
+        :build_tgrad => true,
+        :build_jac => true,
+        :build_expjac => false,
+        :build_invjac => true,
+        :build_invW => true,
+        :build_hes => false,
+        :build_invhes => false,
+        :build_dpfuncs => true)
+    #parameterized_expr = generate_parameterized_function(name, f_expr, test, params, reactants, opts, :(); depvar=:t)
 
     expr_arr_to_block(exprs)
 end
